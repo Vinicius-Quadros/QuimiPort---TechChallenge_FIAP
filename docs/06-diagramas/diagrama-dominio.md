@@ -11,8 +11,6 @@ relacionamentos. Ele é a representação visual do que está descrito em
 
 ![Diagrama de Domínio do QuimiPort](./imagens/diagrama-dominio.jpg)
 
-> Diagrama construído no Miro. Board original:
-> https://miro.com/app/board/uXjVHymVsHU=/?share_link_id=59000625707`
 
 ## Legenda
 

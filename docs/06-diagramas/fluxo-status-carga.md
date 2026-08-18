@@ -10,8 +10,6 @@ Este diagrama representa as transições permitidas e proibidas do campo
 
 ![Fluxo de transição de status da Carga Química](./imagens/fluxo-status-carga.jpg)
 
-> Diagrama construído no Miro. Board original:
-> `https://miro.com/app/board/uXjVHy8-3Nc=/?share_link_id=909003605176`
 
 ## Estados possíveis
 
