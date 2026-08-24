@@ -7,13 +7,13 @@ cada uma deve ficar concentrada na arquitetura da aplicação.
 |---|---|---|
 | RN01 | Um produto químico não pode ser cadastrado sem nome | Domínio — invariante da entidade **Produto Químico** |
 | RN02 | Um produto químico não pode ser cadastrado sem Classificação de Risco | Domínio — invariante da entidade **Produto Químico** |
-| RN03 | Um produto químico inativo não pode ser usado em novas cargas | Domínio — validada no agregado **Carga Química** ao vincular o produto (`vincularProduto`) |
+| RN03 | Um produto químico inativo não pode ser usado em novas cargas | Domínio — validada no agregado **Carga Química** ao vincular o produto (`linkProduct`) |
 | RN04 | Uma carga química não pode ser registrada sem produto químico associado | Domínio — invariante do agregado **Carga Química** |
 | RN05 | Uma carga química não pode ser registrada com produto químico inativo | Domínio — mesma validação da RN03, aplicada no momento do registro |
 | RN06 | Uma carga química não pode ser registrada sem Classificação de Risco | Domínio — invariante do agregado **Carga Química** |
 | RN07 | A quantidade da carga deve ser maior que zero | Domínio — invariante do Objeto de Valor **Quantidade** (validada na criação) |
 | RN08 | Toda carga deve possuir um Responsável Técnico informado | Domínio — invariante do agregado **Carga Química** |
-| RN09 | Uma carga química não pode ser liberada sem documentação obrigatória | Domínio — validada no método de liberação (`alterarStatus`) do agregado **Carga Química** |
+| RN09 | Uma carga química não pode ser liberada sem documentação obrigatória | Domínio — validada no método de liberação (`changeStatus`) do agregado **Carga Química** |
 | RN10 | Uma carga bloqueada não pode entrar em movimentação | Domínio — invariante de transição de status do agregado **Carga Química** |
 | RN11 | Uma carga cancelada não pode ser liberada | Domínio — invariante de transição de status do agregado **Carga Química** |
 | RN12 | Uma carga em inspeção não pode ser finalizada sem antes ser liberada | Domínio — invariante de transição de status do agregado **Carga Química**, coordenada com a entidade **Inspeção** |

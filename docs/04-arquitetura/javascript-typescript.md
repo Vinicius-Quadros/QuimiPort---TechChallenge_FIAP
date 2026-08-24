@@ -12,21 +12,21 @@ Usados para representar conjuntos fechados de valores, evitando strings
 soltas espalhadas pelo código.
 
 ```typescript
-// src/domain/enums/StatusCarga.ts
-export enum StatusCarga {
-  REGISTRADA = "REGISTRADA",
-  EM_INSPECAO = "EM_INSPECAO",
-  LIBERADA = "LIBERADA",
-  BLOQUEADA = "BLOQUEADA",
-  CANCELADA = "CANCELADA",
+// src/domain/enums/CargoStatus.ts
+export enum CargoStatus {
+  REGISTERED = "REGISTRADA",
+  UNDER_INSPECTION = "EM_INSPECAO",
+  RELEASED = "LIBERADA",
+  BLOCKED = "BLOQUEADA",
+  CANCELLED = "CANCELADA",
 }
 
-// src/domain/enums/ClasseRisco.ts
-export enum ClasseRisco {
-  INFLAMAVEL = "INFLAMAVEL",
-  CORROSIVO = "CORROSIVO",
-  TOXICO = "TOXICO",
-  EXPLOSIVO = "EXPLOSIVO",
+// src/domain/enums/RiskClass.ts
+export enum RiskClass {
+  FLAMMABLE = "INFLAMAVEL",
+  CORROSIVE = "CORROSIVO",
+  TOXIC = "TOXICO",
+  EXPLOSIVE = "EXPLOSIVO",
 }
 ```
 
@@ -36,26 +36,26 @@ Um Objeto de Valor nunca é alterado depois de criado — qualquer "mudança"
 gera uma nova instância.
 
 ```typescript
-// src/domain/value-objects/Quantidade.ts
-export class Quantidade {
-  private readonly valorNumerico: number;
-  private readonly unidadeMedida: string;
+// src/domain/value-objects/Quantity.ts
+export class Quantity {
+  private readonly numericValue: number;
+  private readonly unit: string;
 
-  constructor(valorNumerico: number, unidadeMedida: string) {
-    if (valorNumerico <= 0) {
+  constructor(numericValue: number, unit: string) {
+    if (numericValue <= 0) {
       throw new Error("Quantidade deve ser maior que zero"); // RN07
     }
-    this.valorNumerico = valorNumerico;
-    this.unidadeMedida = unidadeMedida;
+    this.numericValue = numericValue;
+    this.unit = unit;
   }
 
-  obterValorFormatado(): string {
-    return `${this.valorNumerico} ${this.unidadeMedida}`;
+  getFormattedValue(): string {
+    return `${this.numericValue} ${this.unit}`;
   }
 
-  converterUnidade(novaUnidade: string): Quantidade {
+  convertUnit(newUnit: string): Quantity {
     // retorna uma NOVA instância, nunca altera a atual
-    return new Quantidade(this.valorNumerico, novaUnidade);
+    return new Quantity(this.numericValue, newUnit);
   }
 }
 ```
@@ -66,46 +66,46 @@ A Carga Química, como agregado raiz, expõe apenas métodos que respeitam
 suas invariantes — nunca permite alterar o status diretamente por fora.
 
 ```typescript
-// src/domain/entities/CargaQuimica.ts
-import { StatusCarga } from "../enums/StatusCarga";
-import { Quantidade } from "../value-objects/Quantidade";
+// src/domain/entities/ChemicalCargo.ts
+import { CargoStatus } from "../enums/CargoStatus";
+import { Quantity } from "../value-objects/Quantity";
 import { DomainError } from "../errors/DomainError";
 
-export class CargaQuimica {
-  private status: StatusCarga;
-  private readonly quantidade: Quantidade;
-  private readonly responsavelTecnicoId: string;
+export class ChemicalCargo {
+  private status: CargoStatus;
+  private readonly quantity: Quantity;
+  private readonly technicalResponsibleId: string;
 
-  constructor(quantidade: Quantidade, responsavelTecnicoId: string) {
-    if (!responsavelTecnicoId) {
+  constructor(quantity: Quantity, technicalResponsibleId: string) {
+    if (!technicalResponsibleId) {
       throw new DomainError("Carga química exige responsável técnico"); // RN08
     }
-    this.quantidade = quantidade;
-    this.responsavelTecnicoId = responsavelTecnicoId;
-    this.status = StatusCarga.REGISTRADA;
+    this.quantity = quantity;
+    this.technicalResponsibleId = technicalResponsibleId;
+    this.status = CargoStatus.REGISTERED;
   }
 
-  liberar(documentacaoCompleta: boolean): void {
-    if (!documentacaoCompleta) {
+  release(documentationComplete: boolean): void {
+    if (!documentationComplete) {
       throw new DomainError("Não é possível liberar sem documentação obrigatória"); // RN09
     }
-    if (this.status === StatusCarga.CANCELADA) {
+    if (this.status === CargoStatus.CANCELLED) {
       throw new DomainError("Carga cancelada não pode ser liberada"); // RN11
     }
-    this.status = StatusCarga.LIBERADA;
+    this.status = CargoStatus.RELEASED;
   }
 
-  cancelar(): void {
-    const podeCancelar =
-      this.status === StatusCarga.REGISTRADA ||
-      this.status === StatusCarga.EM_INSPECAO;
+  cancel(): void {
+    const canCancel =
+      this.status === CargoStatus.REGISTERED ||
+      this.status === CargoStatus.UNDER_INSPECTION;
 
-    if (!podeCancelar) {
+    if (!canCancel) {
       throw new DomainError(
         "Só é possível cancelar cargas em 'Registrada' ou 'Em Inspeção'" // RN14
       );
     }
-    this.status = StatusCarga.CANCELADA;
+    this.status = CargoStatus.CANCELLED;
   }
 }
 ```
@@ -116,13 +116,13 @@ A Application define o contrato; a Infrastructure implementa nas próximas
 fases. Isso mantém o Domain e a Application livres de detalhes técnicos.
 
 ```typescript
-// src/application/repositories/CargaQuimicaRepository.ts
-import { CargaQuimica } from "../../domain/entities/CargaQuimica";
+// src/application/repositories/ChemicalCargoRepository.ts
+import { ChemicalCargo } from "../../domain/entities/ChemicalCargo";
 
-export interface CargaQuimicaRepository {
-  salvar(carga: CargaQuimica): Promise<void>;
-  buscarPorId(id: string): Promise<CargaQuimica | null>;
-  listarPorStatus(status: string): Promise<CargaQuimica[]>;
+export interface ChemicalCargoRepository {
+  save(cargo: ChemicalCargo): Promise<void>;
+  findById(id: string): Promise<ChemicalCargo | null>;
+  listByStatus(status: string): Promise<ChemicalCargo[]>;
 }
 ```
 
@@ -132,17 +132,17 @@ Um exemplo de resultado genérico, reaproveitável por qualquer caso de uso,
 para representar sucesso ou falha sem lançar exceção em todo lugar.
 
 ```typescript
-// src/application/shared/Resultado.ts
-export type Resultado<T> =
-  | { sucesso: true; dado: T }
-  | { sucesso: false; erro: string };
+// src/application/shared/Result.ts
+export type Result<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
 
-export function sucesso<T>(dado: T): Resultado<T> {
-  return { sucesso: true, dado };
+export function success<T>(data: T): Result<T> {
+  return { success: true, data };
 }
 
-export function falha<T>(erro: string): Resultado<T> {
-  return { sucesso: false, erro };
+export function failure<T>(error: string): Result<T> {
+  return { success: false, error };
 }
 ```
 
@@ -152,9 +152,9 @@ Validações que não dependem de estado externo ficam como funções puras,
 fáceis de testar isoladamente.
 
 ```typescript
-// src/domain/validations/validarQuantidade.ts
-export function validarQuantidade(valor: number): boolean {
-  return valor > 0; // RN07
+// src/domain/validations/validateQuantity.ts
+export function validateQuantity(value: number): boolean {
+  return value > 0; // RN07
 }
 ```
 
@@ -164,29 +164,29 @@ Ainda sem implementação real nesta fase, mas os casos de uso já são
 desenhados prevendo chamadas assíncronas a repositórios.
 
 ```typescript
-// src/application/use-cases/LiberarCargaQuimica.ts
-import { CargaQuimicaRepository } from "../repositories/CargaQuimicaRepository";
-import { Resultado, sucesso, falha } from "../shared/Resultado";
+// src/application/use-cases/ReleaseChemicalCargo.ts
+import { ChemicalCargoRepository } from "../repositories/ChemicalCargoRepository";
+import { Result, success, failure } from "../shared/Result";
 
-export class LiberarCargaQuimica {
-  constructor(private readonly repositorio: CargaQuimicaRepository) {}
+export class ReleaseChemicalCargo {
+  constructor(private readonly repository: ChemicalCargoRepository) {}
 
-  async executar(
-    cargaId: string,
-    documentacaoCompleta: boolean
-  ): Promise<Resultado<void>> {
-    const carga = await this.repositorio.buscarPorId(cargaId);
+  async execute(
+    cargoId: string,
+    documentationComplete: boolean
+  ): Promise<Result<void>> {
+    const cargo = await this.repository.findById(cargoId);
 
-    if (!carga) {
-      return falha("Carga química não encontrada");
+    if (!cargo) {
+      return failure("Carga química não encontrada");
     }
 
     try {
-      carga.liberar(documentacaoCompleta);
-      await this.repositorio.salvar(carga);
-      return sucesso(undefined);
-    } catch (erro) {
-      return falha((erro as Error).message);
+      cargo.release(documentationComplete);
+      await this.repository.save(cargo);
+      return success(undefined);
+    } catch (error) {
+      return failure((error as Error).message);
     }
   }
 }
@@ -199,8 +199,8 @@ Erros de regra de negócio são diferenciados de erros técnicos genéricos.
 ```typescript
 // src/domain/errors/DomainError.ts
 export class DomainError extends Error {
-  constructor(mensagem: string) {
-    super(mensagem);
+  constructor(message: string) {
+    super(message);
     this.name = "DomainError";
   }
 }

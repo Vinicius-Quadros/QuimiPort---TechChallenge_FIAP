@@ -31,8 +31,8 @@ relacionamentos. Ele é a representação visual do que está descrito em
   negócio mais críticas do domínio (não liberar sem documentação, não
   movimentar carga bloqueada, não liberar carga cancelada, etc.). Toda
   alteração de estado passa pelos métodos desse agregado
-  (`alterarStatus`, `atualizarQuantidade`,
-  `atualizarClassificacaoRisco`, entre outros).
+  (`changeStatus`, `updateQuantity`,
+  `updateRiskClassification`, entre outros).
 - **Produto Químico** é um agregado separado, com ciclo de vida próprio
   (cadastro, ativação, inativação), por isso é apenas **referenciado** pela
   Carga Química, e não composto por ela.
