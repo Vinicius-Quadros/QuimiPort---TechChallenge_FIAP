@@ -13,6 +13,12 @@ regras de negócio, arquitetura em camadas, decisões arquiteturais, plano de
 qualidade de software e diagramas — base que será evoluída para uma
 aplicação full stack nas próximas fases do curso.
 
+## 🎥 Vídeo de Apresentação
+
+Para conhecer em detalhes a proposta técnica e arquitetural do projeto, assista à nossa apresentação no YouTube:
+
+* 📺 **Assista no YouTube:** [QuimiPort - Vídeo de Apresentação](https://youtu.be/685muIgxetk)
+
 ## Problema que resolve
 
 Hoje o registro de cargas químicas costuma ser manual ou descentralizado,
@@ -93,3 +99,11 @@ ordem:
 
 Ver estratégia detalhada em
 [`adr-003-estrategia-de-evolucao.md`](./docs/04-arquitetura/decisoes-arquiteturais/adr-003-estrategia-de-evolucao.md).
+
+## 👥 Integrantes
+
+| Nome | RM |
+| :--- | :--- |
+| **Vinicius Ribas Quadros** | RM374920 |
+| **Bruno Andrade Ribeiro** | RM374834 |
+| **João Luiz** | RM376860 |
